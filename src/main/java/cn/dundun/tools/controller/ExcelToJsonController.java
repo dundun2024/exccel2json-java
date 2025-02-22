@@ -4,7 +4,11 @@ import cn.dundun.tools.common.Response;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,6 +26,9 @@ import java.util.Map;
 @Slf4j
 @RestController
 public class ExcelToJsonController {
+
+    @Resource
+    private ApplicationContext applicationContext;
 
     @GetMapping("/")
     public String index() {
@@ -58,15 +65,17 @@ public class ExcelToJsonController {
                     <h1>Excel to JSON Converter</h1>
                     <input type="file" id="excelFile">
                     <button onclick="uploadFile()">Convert</button>
+                    <!-- 在原有页面中添加退出按钮 -->
+                    <button onclick="shutdown()" style="margin-left:20px;">退出程序</button>
                     <div id="jsonBlock"></div> <!-- 用于显示JSON的块 -->
                     <button id="copyButton" onclick="copyText()">Copy</button> <!-- 复制按钮 -->
-                
+               \s
                     <script>
                         function uploadFile() {
                             const file = document.getElementById('excelFile').files[0];
                             const formData = new FormData();
                             formData.append('file', file);
-                
+               \s
                             fetch('/upload', {
                                 method: 'POST',
                                 body: formData
@@ -77,7 +86,7 @@ public class ExcelToJsonController {
                             })
                             .catch(error => console.error('Error:', error));
                         }
-                
+               \s
                         function copyText() {
                             const jsonBlock = document.getElementById('jsonBlock');
                             const text = jsonBlock.textContent;
@@ -86,6 +95,11 @@ public class ExcelToJsonController {
                             }).catch(err => {
                                 console.error('Failed to copy text: ', err);
                             });
+                        }
+               \s
+                        function shutdown() {
+                            fetch('/shutdown', { method: 'POST' })
+                            .then(() => setTimeout(() => window.close(), 300))
                         }
                     </script>
                 </body>
@@ -120,4 +134,26 @@ public class ExcelToJsonController {
             throw new RuntimeException("文件解析失败");
         }
     }
+
+    @PostMapping("/shutdown")
+    public Response<?> shutDown(HttpServletRequest request) {
+        log.info(">>>>>>>>> 即将关闭服务");
+
+        new Thread(() -> {
+
+            try {
+                Thread.sleep(1000);
+                SpringApplication.exit(applicationContext, () -> 0);
+                System.exit(0);
+
+                Runtime.getRuntime().halt(0);
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, "shutdown-thread").start();
+
+        return Response.success("服务即将关闭");
+
+    }
+
 }

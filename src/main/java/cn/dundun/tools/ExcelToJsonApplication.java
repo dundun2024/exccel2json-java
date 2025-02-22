@@ -22,7 +22,7 @@ public class ExcelToJsonApplication {
     private static void openBrowser() {
 
         try {
-            Runtime.getRuntime().exec("cmd /c start http://localhost:8080");
+            Runtime.getRuntime().exec("cmd /c start http://localhost:9797");
 
         } catch (IOException e) {
             log.error(">>>>>>>>> 浏览器打开失败", e);

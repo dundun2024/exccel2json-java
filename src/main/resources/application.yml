@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: excel2json
+
+server:
+  port: 9797
