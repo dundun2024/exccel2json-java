@@ -5,7 +5,6 @@ import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
@@ -136,7 +135,7 @@ public class ExcelToJsonController {
     }
 
     @PostMapping("/shutdown")
-    public Response<?> shutDown(HttpServletRequest request) {
+    public Response<?> shutDown() {
         log.info(">>>>>>>>> 即将关闭服务");
 
         new Thread(() -> {
